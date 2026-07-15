@@ -1,22 +1,23 @@
 import React, { useEffect, useState } from "react";
+import { getUser } from "./utils/Auth";
+import { apiFetch } from "./utils/Api";
 
 function CartItems() {
 
+  const user = getUser();
   const [cartItems, setCartItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showAlert, setShowAlert] = useState(false);
 
   // Fetch cart items
   useEffect(() => {
-  const user = JSON.parse(localStorage.getItem("user"));
+    const user = getUser();
 
   async function fetchCartData() {
     try {
 
       // Fetch cart items
-      const itemsResponse = await fetch(
-        `http://localhost:8080/api/cartitems/user/${user.id}`
-      );
+      const itemsResponse = await apiFetch(`/api/cartitems/user/${user.id}`);
       if (!itemsResponse.ok) {
         throw new Error("Failed to load cart items");
       }
@@ -38,13 +39,10 @@ function CartItems() {
     const newQty = item.quantity + 1;
 
     try {
-      const response = await fetch(
-        `http://localhost:8080/api/cartitems/${id}`,
+      const response = await apiFetch(
+          `/api/cartitems/${id}`,
         {
           method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
           body: JSON.stringify({
             quantity: newQty,
           }),
@@ -76,8 +74,8 @@ function CartItems() {
     try {
       // Remove item if quantity becomes 0
       if (newQty <= 0) {
-        const response = await fetch(
-          `http://localhost:8080/api/cartitems/${id}`,
+        const response = await apiFetch(
+            `/api/cartitems/${id}`,
           {
             method: "DELETE",
           }
@@ -90,13 +88,10 @@ function CartItems() {
           prev.filter((i) => i.id !== id)
         );
       } else {
-        const response = await fetch(
-          `http://localhost:8080/api/cartitems/${id}`,
+        const response = await apiFetch(
+            `/api/cartitems/${id}`,
           {
             method: "PUT",
-            headers: {
-              "Content-Type": "application/json",
-            },
             body: JSON.stringify({
               quantity: newQty,
             }),
@@ -133,10 +128,9 @@ function CartItems() {
   // Place order
   const handlePlaceOrder = async () => {
     if (cartItems.length === 0) return;
-    const user = JSON.parse(localStorage.getItem("user"));
     try {
-      const response = await fetch(
-        `http://localhost:8080/api/orders/place-order/${user.id}`,
+      const response = await apiFetch(
+          `/api/orders/place-order/${user.id}`,
         {
           method: "POST",
         }

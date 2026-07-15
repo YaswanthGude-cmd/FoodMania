@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
 import {useNavigate} from "react-router-dom"
+import { apiFetch } from "./utils/Api";
+import { saveUser } from "./utils/Auth";
 
 function EditProfile({user , setUser}) {
   const [alertMessage , setAlertMessage] = useState("");
@@ -68,19 +70,17 @@ function EditProfile({user , setUser}) {
     setLoading(true);
 
     try {
-      const response = await fetch(
-        `http://localhost:8080/api/users/update/${formData.id}`,
+      const response = await apiFetch(
+        `/api/users/update/${formData.id}`,
         {
           method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
           body: JSON.stringify(formData),
         }
       );
 
       if (!response.ok) {
-        setAlertMessage("Update failed");
+        const error = await response.text();
+        setAlertMessage(error || "Update failed");
         setTimeout(() => setAlertMessage(""), 3000);
         return;
       }
@@ -89,7 +89,7 @@ function EditProfile({user , setUser}) {
       setUser(data);
 
       // update localStorage so UI stays synced
-      localStorage.setItem("user", JSON.stringify(data));
+      saveUser(data);
 
       setAlertMessage("Profile updated successfully");
       setTimeout(() => {
