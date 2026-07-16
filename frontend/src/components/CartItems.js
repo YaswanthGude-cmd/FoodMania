@@ -16,6 +16,8 @@ function CartItems() {
   async function fetchCartData() {
     try {
 
+      if(!user) return;
+
       // Fetch cart items
       const itemsResponse = await apiFetch(`/api/cartitems/user/${user.id}`);
       if (!itemsResponse.ok) {

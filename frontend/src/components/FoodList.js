@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import FoodCard from './FoodCard';
+import { apiFetch } from './utils/Api';
 
 function FoodList() {
 
@@ -9,7 +10,7 @@ const [searchTerm , setSearchTerm] = useState("");
 useEffect(() => {
   const fetchFoodItems = async() =>{
       try{
-        const data = await fetch("http://localhost:8080/api/fooditems/all");
+        const data = await apiFetch("/api/fooditems/all")
 
         if(!data.ok) {
           throw new Error("Failed to fetch FoodItems");

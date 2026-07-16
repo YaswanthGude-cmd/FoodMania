@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import './Admin.css';
+import { apiFetch } from './utils/Api';
 
 function Orders() {
 
@@ -12,7 +13,7 @@ useEffect(() => {
   const fetchOrders = async() =>{
 
     try{
-      const response = await fetch(`http://localhost:8080/api/orders/admin-orders/${statusFilter}`);
+      const response = await apiFetch(`/api/orders/admin-orders/${statusFilter}`);
 
       if(!response.ok){
         throw new Error("Failed to fetch Orders");
@@ -33,7 +34,7 @@ useEffect(() => {
 // to update the status of the order by using the buttons 
 const updateStatus = async(orderId , status) => {
   try{
-    const response = await fetch(`http://localhost:8080/api/orders/${orderId}/status/${status}`, {
+    const response = await apiFetch(`/api/orders/${orderId}/status/${status}` , {
       method : "PUT"
     });
 

@@ -1,12 +1,12 @@
 
 import { useState } from 'react'
 import { Link } from 'react-router-dom';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate , useLocation } from 'react-router-dom';
 
  function LoginPage({setUser}){
     const navigate = useNavigate();
-
-    const[email , setemail] = useState("");
+    const location = useLocation();
+    const[email , setemail] = useState(location.state?.email || "");
     const[pass , setpass] = useState("");
     const[msg , setmsg] = useState("");
     const[loading , setloading] = useState(false);

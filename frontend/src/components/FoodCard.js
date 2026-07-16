@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react';
+import { apiFetch } from './utils/Api';
 
 function FoodCard({ item , setFoodItems }) {
 
     const [isEditing, setIsEditing] = useState(false);
+    const [showDeleteModal , setShowDeleteModal] = useState(false);
 
     const [editedFood, setEditedFood] = useState({
         name: item.name || "",
@@ -30,7 +32,7 @@ function FoodCard({ item , setFoodItems }) {
 
     const fetchCategories = async () => {
         try {
-            const res = await fetch("http://localhost:8080/api/category/all");
+            const res = await apiFetch("/api/category/all");
             const data = await res.json();
             setCategories(data);
         } catch (err) {
@@ -40,7 +42,7 @@ function FoodCard({ item , setFoodItems }) {
 
     const fetchRestaurants = async () => {
         try {
-            const res = await fetch("http://localhost:8080/api/restaurant/all");
+            const res = await apiFetch("/api/restaurant/all");
             const data = await res.json();
             setRestaurants(data);
         } catch (err) {
@@ -77,8 +79,7 @@ function FoodCard({ item , setFoodItems }) {
                     editedFood.image
                 );
             }
-            const res = await fetch(
-                `http://localhost:8080/api/fooditems/update/${item.id}`,
+            const res = await apiFetch( `/api/fooditems/update/${item.id}`,
                 {
                     method: "PUT",
                     body: formData
@@ -96,8 +97,7 @@ function FoodCard({ item , setFoodItems }) {
 
     const handleDelete = async () => {
         try {
-            const res = await fetch(
-                `http://localhost:8080/api/fooditems/${item.id}`,
+            const res = await apiFetch( `/api/fooditems/${item.id}`,
                 { method: "DELETE" }
             );
 
@@ -108,9 +108,11 @@ function FoodCard({ item , setFoodItems }) {
             }
 
             setFoodItems(prev => prev.filter(food => food.id !== item.id));
+            setShowDeleteModal(false);
 
         } catch (err) {
             console.error(err);
+            setShowDeleteModal(false);
         }
     };
 
@@ -272,7 +274,7 @@ function FoodCard({ item , setFoodItems }) {
                                 <button className="btn btn-outline-primary btn-sm" onClick={() => setIsEditing(true)}>
                                     Edit
                                 </button>
-                                <button className="btn btn-danger btn-sm" onClick={handleDelete}>
+                                <button className="btn btn-danger btn-sm" onClick={() => setShowDeleteModal(true)}>
                                     Delete
                                 </button>
                             </>
@@ -282,6 +284,51 @@ function FoodCard({ item , setFoodItems }) {
 
                 </div>
             </div>
+            {showDeleteModal && (
+                <>
+                    <div
+                        className="modal fade show"
+                        style={{
+                            display: "block",
+                            backgroundColor: "rgba(0,0,0,0.5)"
+                        }}
+                    >
+                        <div className="modal-dialog modal-dialog-centered">
+                            <div className="modal-content">
+                                <div className="modal-header">
+                                    <h5 className="modal-title">
+                                        Delete Food Item
+                                    </h5>
+                                </div>
+                                <div className="modal-body">
+                                    <p>
+                                        Are you sure you want to delete
+                                        <strong> {item.name}</strong>?
+                                    </p>
+                                    <p className="text-danger mb-0">
+                                        This action cannot be undone.
+                                    </p>
+                                </div>
+                                <div className="modal-footer">
+                                    <button
+                                        className="btn btn-secondary"
+                                        onClick={() => setShowDeleteModal(false)}
+                                    >
+                                        Cancel
+                                    </button>
+                                    <button
+                                        className="btn btn-danger"
+                                        onClick={handleDelete}
+                                    >
+                                        Delete
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="modal-backdrop fade show"></div>
+                </>
+            )}
         </div>
     );
 }

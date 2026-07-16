@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from "react";
+import { getUser } from "./utils/Auth";
+import { apiFetch } from "./utils/Api";
 
 function CategoryPage({ category }) {
   const [items, setItems] = useState([]);
@@ -11,36 +13,39 @@ function CategoryPage({ category }) {
   // 1. Fetch food items
   
   useEffect(() => {
-    fetch(`http://localhost:8080/api/fooditems/category/${category}`)
-      .then((res) => {
-        if (!res.ok) throw new Error("Failed to fetch food items");
-        return res.json();
-      })
-      .then((data) => setItems(data))
-      .catch((err) => console.error("Food fetch error:", err));
+    async function fetchFoodItems() {
+      try{
+        const response = await apiFetch(`/api/fooditems/category/${category}`);
+
+        if(!response.ok){
+          throw new Error("Failed to fetch FoodItems");
+        }
+        const data = await response.json();
+        setItems(data);
+      }catch(err){
+        console.error("Food fetch error :" , err);
+      }
+    }
+    fetchFoodItems();
   }, [category]);
 
 
   // 2. Load cart (ONLY ONCE)
   
 useEffect(() => {
-  const user = JSON.parse(localStorage.getItem("user"));
+  const user = getUser();
   if (!user) return;
   async function fetchCartData() {
     try {
       // 1. Fetch cart directly
-      const cartResponse = await fetch(
-        `http://localhost:8080/api/cart/user/${user.id}`
-      );
+      const cartResponse = await apiFetch(`/api/cart/user/${user.id}`);
       if (!cartResponse.ok) {
         throw new Error("Failed to fetch cart");
       }
       const cartData = await cartResponse.json();
       setCartId(cartData.id);
       // 2. Fetch cart items
-      const itemsResponse = await fetch(
-        `http://localhost:8080/api/cartitems/user/${user.id}`
-      );
+      const itemsResponse = await apiFetch(`/api/cartitems/user/${user.id}`);
       if (!itemsResponse.ok) {
         throw new Error("Failed to fetch cart items");
       }
@@ -72,7 +77,7 @@ const cartMap = React.useMemo(() => {
   // 4. Add to cart (FIXED)
 const addToCart = async (foodId, foodname) => {
   try {
-    const user = JSON.parse(localStorage.getItem("user"));
+    const user = getUser();
 
     if (!user) {
       setAlertMessage("Please login first");
@@ -85,9 +90,8 @@ const addToCart = async (foodId, foodname) => {
     }
 
     // 1. Add item to cart
-    const response = await fetch("http://localhost:8080/api/cartitems", {
+    const response = await apiFetch("/api/cartitems", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         cart: { id: cartId },
         foodItems: { id: foodId },
@@ -101,9 +105,7 @@ const addToCart = async (foodId, foodname) => {
     setTimeout(() => setAlertMessage(""), 3000);
 
     // 2. Re-fetch cart (NO delay hack)
-    const cartRes = await fetch(
-      `http://localhost:8080/api/cartitems/user/${user.id}`
-    );
+    const cartRes = await apiFetch(`/api/cartitems/user/${user.id}`);
     if (!cartRes.ok) {
       throw new Error("Cart refresh failed");
     }

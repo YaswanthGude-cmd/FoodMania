@@ -1,23 +1,49 @@
 import React, { useEffect, useState } from "react";
 import StatCards from "./admin/StatCards";
 import RecentOrder from "./admin/RecentOrder";
+import { apiFetch } from "./utils/Api";
 
 function AdminHome() {
 
   const [stats , setStats] = useState([]);
 
   useEffect(() => {
-    fetch("http://localhost:8080/api/users/admin/stats")
-    .then(res => res.json())
-    .then(data => setStats(data));
+    async function fetchStats() {
+
+      try{
+        const response = await apiFetch("/api/users/admin/stats");
+        if(!response.ok){
+          throw new Error("failed to load Admin Stats");
+        }
+
+        const data = await response.json();
+        setStats(data);
+
+      }catch(err){
+        console.error(err);
+      }
+    }
+    fetchStats();
   },[])
 
   const [orders , setOrders] = useState([]);
 
   useEffect(() => {
-    fetch("http://localhost:8080/api/orders/admin/recent-orders")
-    .then(res => res.json())
-    .then(data => setOrders(data));
+    async function fetchRecentOrders() {
+
+      try{
+        const response = await apiFetch("/api/orders/admin/recent-orders");
+        if(!response.ok){
+          throw new Error("Failed to load Recent Orders");
+        }
+
+        const data = await response.json();
+        setOrders(data);
+      }catch(err){
+        console.error(err);
+      }
+    }
+    fetchRecentOrders();
   }, [])
 
   return (

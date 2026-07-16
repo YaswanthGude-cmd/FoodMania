@@ -24,11 +24,11 @@ import { useState } from 'react';
 
 function App() {
   const location = useLocation();
-
+  const path = location.pathname.toLowerCase();
   const shouldHideNavbar =
-    location.pathname.startsWith("/admin") ||
-    location.pathname === "/login" ||
-    location.pathname === "/register";
+    path.startsWith("/admin") ||
+    path === "/login" ||
+    path === "/register";
   const [user , setUser] = useState(
     JSON.parse(localStorage.getItem("user"))
   );
@@ -36,7 +36,7 @@ function App() {
   return (
     <>
 
-      {!shouldHideNavbar && <Navbar setUser={setUser} user={user} />}
+      {!shouldHideNavbar && <Navbar user={user} setUser={setUser} />}
 
       <Routes>
         {/* Public routes */}

@@ -1,5 +1,6 @@
-import React from 'react'
-import { useState } from 'react'
+import React , { useState } from 'react'
+import { apiFetch } from './utils/Api';
+import { useNavigate } from 'react-router-dom';
 
 function CreateAcc() {
 
@@ -12,6 +13,7 @@ function CreateAcc() {
     const[cpass , setcpass] = useState("");
     const[address , setaddress] = useState("");
     const[loading , setloading] = useState(false);
+    const navigate = useNavigate();
 
     // Function to show the alert box
     const showMessage = (text) => {
@@ -58,11 +60,8 @@ function CreateAcc() {
         showMessage("");
 
         try {
-            const response = await fetch("http://localhost:8080/api/users/register", {
+            const response = await apiFetch("/api/users/register", {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
                 body: JSON.stringify({
                     firstName: fname,
                     lastName: lname,
@@ -90,7 +89,15 @@ function CreateAcc() {
                 setcpass("");
                 setpass("");
                 setpno("");
-                setaddress("")
+                setaddress("");
+                setTimeout(() => {
+                    navigate("/login" , {
+                        state : {
+                            email : mail
+                        }
+                    });
+                } , 1500)
+                
             } else {
                 showMessage(data.message || "Registration Failed");
             }

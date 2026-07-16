@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import { apiFetch } from './utils/Api';
 
 function Users() {
 
@@ -7,7 +8,7 @@ const [users , setUsers] = useState([]);
 
 const fetchUsers = async() => {
   try{
-    const response = await fetch("http://localhost:8080/api/users/admin");
+    const response = await apiFetch("/api/users/admin")
 
     if(!response.ok){
       throw new Error("Failed Fetch users data");
@@ -24,7 +25,7 @@ useEffect(() => { fetchUsers() } , [])
 
 const updateStatus = async(id , status) => {
   try{
-    const response = await fetch(`http://localhost:8080/api/users/${id}/status?status=${status}` , {
+    const response = await apiFetch(`/api/users/${id}/status?status=${status}` , {
       method : "PUT"
     });
 

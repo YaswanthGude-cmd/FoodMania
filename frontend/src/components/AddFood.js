@@ -1,4 +1,5 @@
 import React, { useState , useRef } from 'react'
+import { apiFetch } from './utils/Api';
 
 
 function AddFood() {
@@ -33,9 +34,10 @@ function AddFood() {
       formData.append("price" , price);
       formData.append("restaurantId" , restaurantId);
       formData.append("categoryId" , categoryId);
-      formData.append("image" , image)
+      formData.append("image" , image);
+      formData.append("avaliable" , available);
 
-      const response = await fetch("http://localhost:8080/api/fooditems/additem" ,{
+      const response = await apiFetch("/api/fooditems/additem" ,{
         method : "POST",
         body : formData
       });

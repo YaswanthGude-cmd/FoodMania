@@ -62,8 +62,13 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth.
                         requestMatchers(
                                 "/api/users/register",
-                                "/api/users/login"
+                                "/api/users/login",
+                                "/api/fooditems/**",
+                                "/api/category/**",
+                                "/api/restaurant/**"
                         ).permitAll()
+                        .requestMatchers("/api/admin/**")
+                        .hasRole("ADMIN")
                         .anyRequest().authenticated())
                 .addFilterBefore(
                         jwtAuthenticationFilter ,
